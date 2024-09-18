@@ -1,12 +1,13 @@
 from Gemini import Gemini
 from FileProcessor import FileProcessor
 from Project import Project
-import os
 
 import config.gemini
 import config.file
 
-class Main:
+from Commands import Commands
+
+class App:
 	def __init__(self):
 		self.exit = False
 
@@ -16,71 +17,10 @@ class Main:
 		self.directory = None
 		self.directory_content = None
 
-		self.commands = {
-			"q": {
-				"execute": self.exitCmd,
-				"description": "Exits the program"
-			},
-			"help": {
-				"execute": self.helpCmd,
-				"description": "Displays all available commands"
-			},
-			"cls": {
-				"execute": self.clearCmd,
-				"description": "Clears the console"
-			},
+		self.init_commands()
 
-			"run": {
-				"execute": self.runCmd,
-				"description": "Runs the Gemini model with the input text"
-			},
-
-			"project:new": {
-				"execute": self.createProjectCmd,
-				"description": "Creates a new project"
-			},
-
-			"project:load": {
-				"execute": self.loadProjectCmd,
-				"description": "Loads an existing project"
-			},
-
-			"project:save": {
-				"execute": self.saveProjectCmd,
-				"description": "Saves the current project"
-			},
-
-			"project:dir:set": {
-				"execute": self.setDirectoryCmd,
-				"description": "Sets the directory for the project"
-			},
-
-			"project:dir": {
-				"execute": self.showDirectoryCmd,
-				"description": "Shows the current directory"
-			},
-
-			"project:chat:history:print": {
-				"execute": self.printChatHistoryToFileCmd,
-				"description": "Prints the chat history to a file"
-			}
-		}
-
-	def exitCmd(self):
-		self.exit = True
-
-		if self.project:
-			self.project.save()
-
-	def helpCmd(self):
-		print("Available commands:")
-		for command in self.commands:
-			print(command + " - " + self.commands[command]["description"])
-
-
-	def runCmd(self):
-		text = input(": ")
-		print(self.gemini.run(text).text)
+	def init_commands(self):
+		self.commands = Commands(self)
 
 	def createProjectCmd(self):
 		name = input("Enter project name: ")
@@ -124,19 +64,17 @@ class Main:
 	def printChatHistoryToFileCmd(self):
 		print(self.project.getChatHistory())
 
-	def clearCmd(self):
-		os.system('cls')
-
 	def run(self):
 		while not self.exit:
-			command = input("Enter command: ")
+			signature = input("Enter command: ")
 
-			if command in self.commands:
-				self.commands[command]["execute"]()
+			command = self.commands.find_command(signature)
+
+			if command:
+				command.execute()
 			else:
-				print("Command not found - type help to see all available commands")
+				print("Command not found")
 
-		print("Execution finished")
-
-interface = Main()
-interface.run()
+if(__name__ == "__main__"):
+	app = App()
+	app.run()

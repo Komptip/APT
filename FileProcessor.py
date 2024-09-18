@@ -105,9 +105,3 @@ class FileProcessor:
     def directory_exists(self, directory):
         directory = self.path(directory)
         return os.path.exists(directory)
-
-if __name__ == '__main__':
-    file_processor = FileProcessor(config)
-    files = file_processor.read_directory('C:\OSPanel\domains\\newlabel')
-    
-    file_processor.write_to_file('C:\APT\output.txt', files)
